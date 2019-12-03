@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 '''
     File name: Space_Shooter.py
     Author: Joshua Willman
@@ -6,16 +6,14 @@
     Date last modified: 2018.12.02
     Python version: 3.4
 
-    For a tutorial about writing your own space shooter or to understand how the 
+    For a tutorial about writing your own space shooter or to understand how the
     game was created, please check out:
     https://www.redhulimachinelearning.com
 '''
 
 # import necessary packages
-import pygame, sys, random
-from pygame import *
-from os import path
-import math
+
+from EnemyShip import *
 
 img_dir = path.join(path.dirname(__file__), 'images')
 sound_dir = path.join(path.dirname(__file__), 'sounds')
@@ -47,14 +45,14 @@ class Player(pygame.sprite.Sprite):
     '''create Player class'''
     def __init__(self, player_image, bullet_image, missile_image, sprites_list, bullet_list, bullet_sound, missile_sound):
         super().__init__()
-        # scale player image 
+        # scale player image
         self.image = pygame.transform.scale(player_image, (70, 70))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
 
         # sprites list
         self.sprites = sprites_list
-        
+
         # player starting location
         self.rect.centerx = WINDOWWIDTH / 2
         self.rect.bottom = WINDOWHEIGHT - 10
@@ -93,9 +91,9 @@ class Player(pygame.sprite.Sprite):
             self.upgrade -= 1
             self.upgrade_timer = pygame.time.get_ticks()
 
-        # make player static in screen by default 
-        self.speedx = 0 
-        self.speedy = 0 
+        # make player static in screen by default
+        self.speedx = 0
+        self.speedy = 0
 
         # then check if there is event handling for arrow keys
         keys = pygame.key.get_pressed()
@@ -122,7 +120,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > WINDOWHEIGHT - 10 and self.rect.bottom < WINDOWHEIGHT:
             self.rect.bottom = WINDOWHEIGHT - 10
 
-        # Stop player from being able to move or shoot 
+        # Stop player from being able to move or shoot
         # when at the bottom of the screen
         if self.rect.bottom > WINDOWHEIGHT + 10:
             self.rect.center = (WINDOWWIDTH / 2, WINDOWHEIGHT + 100)
@@ -176,69 +174,6 @@ class Player(pygame.sprite.Sprite):
         self.hidden = True
         self.rect.center = (WINDOWWIDTH / 2, WINDOWHEIGHT + 100) # hide player below the screen
         self.hide_timer = pygame.time.get_ticks()
-        
-
-class EnemyShip(pygame.sprite.Sprite):
-    '''create EnemyShip class'''
-    def __init__(self, enemy_image, bullet_image, sprites_list, bullet_list, bullet_sound, boost_anim):
-        super().__init__()
-        # scale enemy image 
-        self.image = pygame.transform.scale(enemy_image, (60, 60))
-        self.rect = self.image.get_rect()
-
-        # sprites list
-        self.sprites = sprites_list
-        self.boost_anim = boost_anim
-
-        # enemy starting location
-        self.rect.centerx = random.randrange(90, WINDOWWIDTH - 90)
-        self.rect.bottom = random.randrange(-150, -20)
-
-        # bullet attributes for enemy
-        self.bullet_image = bullet_image
-        self.bullet_sound = bullet_sound
-        self.bullets = bullet_list
-        self.shoot_delay = 500
-        self.last_shot = pygame.time.get_ticks()
-        self.num_of_shots = 2
-
-        # enemy kamikaze boost speed
-        self.speedy = 30
-
-    def update(self):
-        '''update enemy movement'''
-        if self.rect.bottom > 50 and self.rect.bottom < 130:
-            for i in range(self.num_of_shots):
-                    self.shoot()
-
-        if self.rect.bottom <= 120:
-            self.rect.bottom += 4
-        if self.rect.bottom > 120 and self.rect.bottom < 140:
-            self.rect.bottom += 1
-        if self.rect.bottom >= 140:
-            self.divebomb()
-
-        # if ships go off the screen, respawn them
-        if (self.rect.top > WINDOWHEIGHT):
-            self.rect.centerx = random.randrange(50, WINDOWWIDTH - 50)
-            self.rect.y = random.randrange(-200, -50)
-
-    def shoot(self):
-        '''fire lasers'''
-        current_time = pygame.time.get_ticks()
-        if current_time - self.last_shot > self.shoot_delay:
-            self.last_shot = current_time
-            bullet = EnemyBullet(self.bullet_image, self.rect.centerx, self.rect.bottom)
-            self.sprites.add(bullet)
-            self.bullets.add(bullet)
-            self.bullet_sound.play()
-            self.bullet_sound.set_volume(0.2)
-
-    def divebomb(self):
-        '''divebomb flight pattern'''
-        boost = Boost(self.rect.center, 'boost', self.boost_anim)
-        self.sprites.add(boost)
-        self.rect.bottom += self.speedy
 
 
 class Boost(pygame.sprite.Sprite):
@@ -263,11 +198,11 @@ class Boost(pygame.sprite.Sprite):
             if self.frame == len(self.boost_anim[self.b_type]):
                 self.kill()
             else:
-                center = self.rect.center 
+                center = self.rect.center
                 self.image = self.boost_anim[self.b_type][self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.midtop = center
-        
+
 
 class Bullet(pygame.sprite.Sprite):
     '''create Bullet class'''
@@ -288,28 +223,6 @@ class Bullet(pygame.sprite.Sprite):
 
         # if bullet goes off top of window, destroy it
         if self.rect.bottom < 35:
-            self.kill()
-
-
-class EnemyBullet(pygame.sprite.Sprite):
-    '''create Enemy Bullet class'''
-    def __init__(self, bullet_image, x, y):
-        super().__init__()
-        # scale bullet size
-        self.image = pygame.transform.scale(bullet_image, (8, 23))
-        self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()
-        # bullet position is according the player position
-        self.rect.centerx = x
-        self.rect.bottom = y
-        self.speedy = 15
-
-    def update(self):
-        '''update bullet'''
-        self.rect.y += self.speedy
-
-        # if bullet goes off bottom of window, destroy it
-        if self.rect.bottom > WINDOWHEIGHT:
             self.kill()
 
 
@@ -371,7 +284,7 @@ class Asteroid(pygame.sprite.Sprite):
         if current_time - self.last_update > 50:
             self.last_update = current_time # reset current time
             self.angle = (self.angle + self.rotation_speed) % 360
-            new_image = pygame.transform.rotate(self.image_orig, self.angle) 
+            new_image = pygame.transform.rotate(self.image_orig, self.angle)
             old_center = self.rect.center
             self.image = new_image
             self.rect = self.image.get_rect()
@@ -433,7 +346,7 @@ class Shield(pygame.sprite.Sprite):
         self.center = center
         self.rect = self.image.get_rect(center=(self.center))
         self.player = player
-    
+
     def update(self):
         '''update shield location'''
         self.rect.centerx = self.player.rect.centerx
@@ -444,7 +357,7 @@ class Shield(pygame.sprite.Sprite):
         elif self.player.shield > 30:
             self.rect.centerx = self.player.rect.centerx
             self.rect.centery = self.player.rect.centery
-        
+
 
 def draw_text(surface, text, size, x, y, color):
     '''draw text to screen'''
@@ -458,7 +371,7 @@ def menu():
     '''display main menu'''
     pygame.mixer.music.load(path.join(sound_dir, 'SpaceShooter_Theme.wav'))
     pygame.mixer.music.play(-1)
-    
+
     title = pygame.image.load(path.join(img_dir, "The_Lonely_Shooter.png")).convert_alpha()
     title = pygame.transform.scale(title, (WINDOWWIDTH, 81 * 2))
     background = pygame.image.load('images/stars_bg.jpeg').convert()
@@ -497,7 +410,7 @@ def menu():
                 sys.exit()
         elif event.type == QUIT:
             pygame.quit()
-            sys.exit()    
+            sys.exit()
 
 def draw_lives(surface, x, y, lives, image):
     '''display ship's lives on the screen'''
@@ -522,7 +435,7 @@ def shield_bar(surface, player_shield):
     pygame.draw.rect(surface, GREY, (5, 5, 104, 24), 3)
     pygame.draw.rect(surface, player_shield_color, (7, 7, player_shield, 20))
 
-def main(): 
+def main():
     '''main loop'''
     #### load all game images ####
     # draw background rectangle first
@@ -534,7 +447,7 @@ def main():
     planet_rect = planet.get_rect(center=(70,70))
 
     black_bar = pygame.Surface((WINDOWWIDTH, 35))
-    
+
     # load player and bullet images
     player_img = pygame.image.load('images/spaceship.png').convert()
     life_player_image = pygame.transform.scale(player_img, (25, 25))
@@ -554,7 +467,7 @@ def main():
         'asteroid_medium1.png',
         'asteroid_medium3.png',
         'asteroid_big1.png',
-        'asteroid_tiny.png'   
+        'asteroid_tiny.png'
     ]
 
     for image in asteroid_list:
@@ -573,7 +486,7 @@ def main():
         explosion_anim['large'].append(image_lg)
         image_sm = pygame.transform.scale(img, (45, 45))
         explosion_anim['small'].append(image_sm)
-    
+
     for i in range(10):
         filename = 'ship_explosion0{}.png'.format(i)
         img = pygame.image.load(path.join(img_dir, filename)).convert()
@@ -595,9 +508,9 @@ def main():
     # load powerup images
     powerup_images = {}
     powerup_images['shield'] = pygame.image.load(path.join(img_dir, 'shield.png')).convert_alpha()
-    powerup_images['shield'] = pygame.transform.scale(powerup_images['shield'], (35, 35)) 
+    powerup_images['shield'] = pygame.transform.scale(powerup_images['shield'], (35, 35))
     powerup_images['missile'] = pygame.image.load(path.join(img_dir, 'missile_powerup.png')).convert_alpha()
-    powerup_images['missile'] = pygame.transform.scale(powerup_images['missile'], (45, 45)) 
+    powerup_images['missile'] = pygame.transform.scale(powerup_images['missile'], (45, 45))
 
     # load game sounds
     bullet_sound = pygame.mixer.Sound(path.join(sound_dir, 'laser.wav'))
@@ -638,22 +551,22 @@ def main():
             # create group for enemies
             enemy_ships = pygame.sprite.Group()
 
-            player = Player(player_img, bullet_img, missile_img, all_active_sprites, 
+            player = Player(player_img, bullet_img, missile_img, all_active_sprites,
                             bullets, bullet_sound, missile_sound)
             shield = Shield(energy_shield, player.rect.center, player)
             all_active_sprites.add(player, shield)
 
             for i in range(2):
-                enemy_ship = EnemyShip(enemy_img, enemy_bullet_img, all_active_sprites, 
+                enemy_ship = EnemyShip(enemy_img, enemy_bullet_img, all_active_sprites,
                                        enemy_bullets, enemy_bullet_sound, boost_anim)
                 all_active_sprites.add(enemy_ship)
                 enemy_ships.add(enemy_ship)
-            
+
             for i in range(7):
                 new_asteroid = Asteroid(asteroid_images, all_active_sprites, asteroids)
                 all_active_sprites.add(new_asteroid)
-                asteroids.add(new_asteroid)   
-            
+                asteroids.add(new_asteroid)
+
             # score variable
             score = 0
 
@@ -698,11 +611,11 @@ def main():
                 powerup = PowerUp(hit.rect.center, powerup_images)
                 all_active_sprites.add(powerup)
                 powerups.add(powerup)
-            new_ship = EnemyShip(enemy_img, enemy_bullet_img, all_active_sprites, enemy_bullets, 
+            new_ship = EnemyShip(enemy_img, enemy_bullet_img, all_active_sprites, enemy_bullets,
                                  enemy_bullet_sound, boost_anim)
             all_active_sprites.add(new_ship)
             enemy_ships.add(new_ship)
-            
+
         # check if enemy bullet hit player
         player_hit_by_bullet = pygame.sprite.spritecollide(player, enemy_bullets, True)
 
@@ -750,7 +663,7 @@ def main():
             ship_expl.set_volume(0.1)
             expl = Explosion(hit.rect.center, 'ship', explosion_anim)
             all_active_sprites.add(expl)
-            new_ship = EnemyShip(enemy_img, enemy_bullet_img, all_active_sprites, enemy_bullets, 
+            new_ship = EnemyShip(enemy_img, enemy_bullet_img, all_active_sprites, enemy_bullets,
                                  enemy_bullet_sound, boost_anim)
             all_active_sprites.add(new_ship)
             enemy_ships.add(new_ship)
@@ -761,10 +674,10 @@ def main():
                 player.hide()
                 player.lives -= 1
                 player.shield = 100
-        
+
         # check for collisions between player and power ups
         powerup_hit = pygame.sprite.spritecollide(player, powerups, True)
-        
+
         # check if player hits power up
         for hit in powerup_hit:
             if hit.type == 'shield':
@@ -775,15 +688,15 @@ def main():
             if hit.type == 'missile':
                 score += 50
                 player.upgrade_power()
-        
+
         # If player dies, return to menu
         if player.lives == 0 and not expl_ship.alive():
             #print("in loop")
             #running = False
             pygame.mixer.music.stop()
             show_menu = True
-            
-        # draw/render 
+
+        # draw/render
         DISPLAYSURF.fill(BLACK)
         # draw background image to game
         DISPLAYSURF.blit(background, background_rect)
