@@ -1,18 +1,9 @@
-#!/usr/bin/env python
-'''
-    File name: Space_Shooter.py
-    Author: Joshua Willman
-    Date created: 2018.10.28
-    Date last modified: 2018.12.02
-    Python version: 3.4
-
-    For a tutorial about writing your own space shooter or to understand how the
-    game was created, please check out:
-    https://www.redhulimachinelearning.com
-'''
 
 # import necessary packages
-
+import random
+import pygame, random
+from pygame import *
+from os import path
 from EnemyShip import *
 
 img_dir = path.join(path.dirname(__file__), 'images')
@@ -21,6 +12,7 @@ sound_dir = path.join(path.dirname(__file__), 'sounds')
 WINDOWWIDTH = 480
 WINDOWHEIGHT = 600
 FPS = 30
+
 
 # colors
 BLACK = (0,0,0)
@@ -562,10 +554,10 @@ def main():
                 all_active_sprites.add(enemy_ship)
                 enemy_ships.add(enemy_ship)
 
-            for i in range(7):
-                new_asteroid = Asteroid(asteroid_images, all_active_sprites, asteroids)
-                all_active_sprites.add(new_asteroid)
-                asteroids.add(new_asteroid)
+            #for i in range(7):
+             #   new_asteroid = Asteroid(asteroid_images, all_active_sprites, asteroids)
+              #  all_active_sprites.add(new_asteroid)
+               # asteroids.add(new_asteroid)
 
             # score variable
             score = 0
@@ -594,9 +586,9 @@ def main():
                 powerup = PowerUp(hit.rect.center, powerup_images)
                 all_active_sprites.add(powerup)
                 powerups.add(powerup)
-            new_asteroid = Asteroid(asteroid_images, all_active_sprites, asteroids)
-            all_active_sprites.add(new_asteroid)
-            asteroids.add(new_asteroid)
+            #new_asteroid = Asteroid(asteroid_images, all_active_sprites, asteroids)
+            #all_active_sprites.add(new_asteroid)
+            #asteroids.add(new_asteroid)
 
         # check if a bullet hit an enemy ship
         enemy_hit = pygame.sprite.groupcollide(enemy_ships, bullets, True, pygame.sprite.collide_circle)
@@ -642,9 +634,9 @@ def main():
             small_expl.set_volume(0.1)
             expl = Explosion(hit.rect.center, 'small', explosion_anim)
             all_active_sprites.add(expl)
-            new_asteroid = Asteroid(asteroid_images, all_active_sprites, asteroids)
-            all_active_sprites.add(new_asteroid)
-            asteroids.add(new_asteroid)
+           # new_asteroid = Asteroid(asteroid_images, all_active_sprites, asteroids)
+            # all_active_sprites.add(new_asteroid)
+            # asteroids.add(new_asteroid)
             if player.shield <= 0:
                 ship_expl.play()
                 expl_ship = Explosion(player.rect.center, 'ship', explosion_anim)
